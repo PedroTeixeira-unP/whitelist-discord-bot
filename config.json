@@ -1,7 +1,7 @@
 {
-	"token": "MTA2NzA5MTQ1NDg3MjI1NjYzMw.GXoNBm.dReJTrJ81zfncC2rEu6ZHEIlVAFobmXUOCL1lw",
-    "guildID": {
-        "message":"1065412749993189516",
-        "logs": "1067229211963691038"
-    }
+	"token": "", //discord bot token
+	    "guildID": {
+		"message":"", //ID of the channel that will show the message 
+		"logs": "" //ID of the channel that will show the logs
+	    }
 }
