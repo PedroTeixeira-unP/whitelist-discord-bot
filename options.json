@@ -1,0 +1,14 @@
+{
+    "fields": [
+        {
+            "id": "name",
+            "label": "Diz me o teu nome",
+            "style": "short"
+        },
+        {
+            "id": "discord",
+            "label": "Escreve o teu discord",
+            "style": "paragraph"
+        }
+    ]
+}
