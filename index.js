@@ -1,6 +1,5 @@
 // Require the necessary discord.js classes
 const { Client, GatewayIntentBits } = require('discord.js');
-const { token, guildID } = require('./config.json');
 const dotenv = require('dotenv');
 const { ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { fields } = require('./options.json');
