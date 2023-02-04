@@ -1,12 +1,15 @@
 // Require the necessary discord.js classes
 const { Client, GatewayIntentBits } = require('discord.js');
 const { token, guildID } = require('./config.json');
+const dotenv = require('dotenv');
 const { ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { fields } = require('./options.json');
 const { EmbedBuilder } = require('discord.js');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+dotenv.config();
 
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
@@ -42,7 +45,7 @@ client.once(Events.ClientReady, c => {
 		timestamp: new Date().toISOString()
 	};
 
-	client.channels.cache.get(guildID.message).send({ embeds: [exampleEmbed] });
+	client.channels.cache.get(process.env.guildid_message).send({ embeds: [exampleEmbed] });
 
 
 	// Add Reaction
@@ -104,7 +107,7 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 // Log in to Discord with your client's token
-client.login(token);
+client.login(process.env.token);
 
 
 
@@ -131,5 +134,5 @@ function sendLog(user, answers)
 		timestamp: new Date().toISOString()
 	};
 
-	client.channels.cache.get(guildID.logs).send({ embeds: [exampleEmbed] });
+	client.channels.cache.get(process.env.guildid_logs).send({ embeds: [exampleEmbed] });
 }

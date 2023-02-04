@@ -1,7 +1,0 @@
-{
-	"token": "", //discord bot token
-	    "guildID": {
-		"message":"", //ID of the channel that will show the message 
-		"logs": "" //ID of the channel that will show the logs
-	    }
-}
