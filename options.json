@@ -2,13 +2,28 @@
     "fields": [
         {
             "id": "name",
-            "label": "Diz me o teu nome",
+            "label": "QUAL O NOME DO SEU PERSONAGEM E IDADE?",
             "style": "short"
         },
         {
             "id": "discord",
-            "label": "Escreve o teu discord",
-            "style": "paragraph"
+            "label": "O QUE SIGNIFICA ROLEPLAY?",
+            "style": "short"
+        },
+        {
+            "id": "combat",
+            "label": "O QUE É COMBAT LOGGING?",
+            "style": "short"
+        },
+        {
+            "id": "life",
+            "label": "O QUE SIGNIFICA AMOR À VIDA?",
+            "style": "short"
+        },
+        {
+            "id": "antirp",
+            "label": "O QUE É ANTI-RP?",
+            "style": "short"
         }
     ]
 }
