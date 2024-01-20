@@ -1,20 +1,17 @@
-
 # Custom whitelist for discord
 
-Hi everyone, 
+Hello everyone,
 
-This is a whitelist bot for discord. It has full customization, to use with your own discord application and your own questions.
+I'm excited to introduce our custom whitelist bot for Discord. Designed with full customization options, it seamlessly integrates with your Discord application and allows you to tailor it with your own set of questions. Best of all, it's completely free to use! Add your own unique twist to enhance your community's experience. 
 
-**PLEASE BE AWARE THIS IS STILL IN DEVELOPMENT**
+This bot was created with the sole purpose of assisting communities in need of an effective and adaptable whitelist system. 
 
+Give it a try and improve your community!
+
+
+```
 If you encounter any issues, please be free to create an issue for me to fix it :)
-
-it may help a lot of users searching for this
-
-## Tech Stack
-
-**Server:** Node
-
+```
 
 ## Authors
 
