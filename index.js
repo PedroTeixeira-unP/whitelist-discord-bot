@@ -9,17 +9,20 @@ const {
   TextInputStyle,
 } = require("discord.js");
 const { fields } = require("./options.json");
-const { EmbedBuilder } = require("discord.js");
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
+  ],
+});
 
 dotenv.config();
 
-// When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, (c) => {
-  //Terminal message to let us know the code running fine
   console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
@@ -52,12 +55,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       // Show the modal to the user
       await interaction.showModal(modal);
       break;
-
     case "command":
       whitelistMessage();
-      break;
-    case "test":
-      runCommand(interaction);
       break;
     default:
       break;
@@ -120,36 +119,100 @@ function whitelistMessage() {
       icon_url:
         "https://media.discordapp.net/attachments/1062661432031854602/1062732029361389608/logo-simple.png?width=1179&height=663",
     },
-    timestamp: new Date().toISOString(),
   };
 
   client.channels.cache
     .get(process.env.guildid_message)
     .send({ embeds: [exampleEmbed] });
-
-  // Add Reaction
-  // client.channels.cache.get(guildID).send({ embeds: [exampleEmbed] }).then((sent) => {
-  //     sent.react('✅');
-  //   });
 }
 
-// Logs message sended after submition
 function sendLog(user, answers) {
-  // inside a command, event listener, etc.
   const exampleEmbed = {
     color: 0x0099ff,
-    title: ":1658partnerwaitapproval: Usuário aguardando sua aprovação!",
+    title: "Usuário aguardando sua aprovação!",
     url: "https://discord.js.org",
     author: {
       name: "Nova aplicação de whitelist",
       icon_url:
         "https://media.discordapp.net/attachments/1062661432031854602/1062732029361389608/logo-simple.png?width=1179&height=663",
     },
-    description: `Utilizador <@${user.id}>`,
     thumbnail: {
       url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=256`,
     },
-    fields: answers,
+    fields: [
+      ...answers,
+      {
+        name: "Utilizador",
+        value: `<@${user.id}>`, // This will create a mention of the user
+        inline: false,
+      },
+    ],
+    footer: {
+      text: "Sistema de whitelist.",
+      icon_url:
+        "https://media.discordapp.net/attachments/1062661432031854602/1062732029361389608/logo-simple.png?width=1179&height=663",
+    },
+    timestamp: new Date().toISOString(),
+  };
+
+  const messageContent = `Novo pedido de whitelist de <@${user.id}>`;
+
+  client.channels.cache
+    .get(process.env.guildid_logs)
+    .send({ content: messageContent, embeds: [exampleEmbed] })
+    .then((sentMessage) => {
+      sentMessage.react("✅");
+      sentMessage.react("❌");
+    });
+}
+
+function accept(member) {
+  member.roles.add(process.env.roleid);
+}
+
+client.on("messageReactionAdd", async (reaction, user) => {
+  if (user.bot) return;
+
+  if (reaction.message.channel.id === process.env.guildid_logs) {
+    const mentions = reaction.message.mentions.users;
+
+    if (reaction.emoji.name === "✅") {
+      mentions.forEach(async (mentionedUser) => {
+        try {
+          const member = await reaction.message.guild.members.fetch(
+            mentionedUser.id
+          );
+          await accept(member);
+          await member.send("A tua aplicação para a whitelist foi aceite.");
+          sendApprovalLog(user, mentionedUser);
+        } catch (error) {
+          console.error(`Error adding role to ${mentionedUser.tag}:`, error);
+          return;
+        }
+      });
+    } else if (reaction.emoji.name === "❌") {
+      const member = await reaction.message.guild.members.fetch(
+        mentionedUser.id
+      );
+      await member.send("A tua aplicação para a whitelist foi rejeitada.");
+      mentions.forEach(async (mentionedUser) => {
+        sendRejectLog(user, mentionedUser);
+      });
+    }
+
+    await reaction.message.delete();
+  }
+});
+
+function sendApprovalLog(user, member) {
+  const exampleEmbed = {
+    color: 0x0099ff,
+    fields: [
+      {
+        name: "",
+        value: `O utilizador <@${member.id}> foi aceite por: <@${user.id}> `,
+      },
+    ],
     footer: {
       text: "Sistema de whitelist.",
       icon_url:
@@ -163,44 +226,24 @@ function sendLog(user, answers) {
     .send({ embeds: [exampleEmbed] });
 }
 
-// Run command from other bot
-function runCommand(interaction) {
-  // Extract the 'nomedomembro' parameter from the interaction
-  const member = interaction.options.getUser("user");
-  if (!member) {
-    interaction.reply({ content: "No user specified.", ephemeral: true });
-    return;
-  }
+function sendRejectLog(user, member) {
+  const exampleEmbed = {
+    color: 0x0099ff,
+    fields: [
+      {
+        name: "",
+        value: `O utilizador <@${member.id}> foi rejeitada por: <@${user.id}> `,
+      },
+    ],
+    footer: {
+      text: "Sistema de whitelist.",
+      icon_url:
+        "https://media.discordapp.net/attachments/1062661432031854602/1062732029361389608/logo-simple.png?width=1179&height=663",
+    },
+    timestamp: new Date().toISOString(),
+  };
 
-  // The command for the other bot, including the member's username or ID
-  const commandForOtherBot = `/aprovar ${member.username}`; // or member.id, depending on how the other bot recognizes users
-
-  // The channel where you want to send the command
-  // This should be a channel where the other bot is listening for commands
-  const channelId = process.env.GUILDID_LOGS;
-
-  // Fetch the channel from the client
-  const channel = client.channels.cache.get(channelId);
-
-  if (!channel) {
-    console.error("Command channel not found");
-    return;
-  }
-
-  // Send the command message to the channel
-  channel
-    .send(commandForOtherBot)
-    .then(() => {
-      interaction.reply({
-        content: "Command sent to the other bot.",
-        ephemeral: true,
-      });
-    })
-    .catch((error) => {
-      console.error("Error sending command to the other bot:", error);
-      interaction.reply({
-        content: "Failed to send command to the other bot.",
-        ephemeral: true,
-      });
-    });
+  client.channels.cache
+    .get(process.env.guildid_logs)
+    .send({ embeds: [exampleEmbed] });
 }
